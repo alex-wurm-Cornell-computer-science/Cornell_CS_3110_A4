@@ -8,6 +8,12 @@ module type ElementSig = sig
   include Dictionary.KeySig with type t := t
 end
 
+(** The type of units. *)
+(* module Unit = struct *)
+  (* type t = unit *)
+  (* include ValueSig with type t := t *)
+(* end *)
+
 (** A [Set] contains elements, which must be comparable. *)
 module type Set = sig
 
@@ -15,8 +21,16 @@ module type Set = sig
       in the set and functions on them. *)
   module Elt : ElementSig
 
+
+  (** [Unit] is a module representing the type of unit values
+      in the set and functions on them. *)
+  (* module Un = Unit *)
+
   (** [elt] is the type of elements in the set. *)
   type elt = Elt.t
+
+  (** [un] is the type of units in the set. *)
+  (* type un = Un.t *)
 
   (** [t] is the type of sets. *)
   type t
