@@ -16,6 +16,7 @@ module type Set = sig
   type elt = Elt.t
   module Un = Unit
   type un = Un.t
+  (* module D = Dictionary.DictionaryMaker(Elt)(Un).t *)
   type t
   val rep_ok : t  -> t
   val empty : t
@@ -46,7 +47,15 @@ module Make =
     (** AF: TODO: document the abstraction function.
         RI: TODO: document any representation invariants. *)
 
-    type t = DM(Elt)(Un).t
+    module D = DM(Elt)(Un)
+
+    type t = D.t
+
+    let compare x y =
+    match Elt.compare (fst x) (fst y) with
+    | LT -> -1
+    | EQ -> 0
+    | GT -> 1
 
     let rep_ok s =
       (*failwith "Unimplemented"*)
@@ -54,48 +63,38 @@ module Make =
 
     let empty =
       (* TODO: replace [()] with a value of your rep type [t]. *)
-      []
+      D.empty
 
     let is_empty s =
       (*failwith "Unimplemented"*)
-      match s with
-      | [] -> true
-      | h::t -> false
+      if s = D.empty then true else false
 
     let size s =
       (*failwith "Unimplemented"*)
-      List.length s
+      D.size s
 
     let insert x s =
       (*failwith "Unimplemented"*)
-      let exists = List.mem_assoc x s in
-
-      if exists then s 
-      else (x,()) :: s
+      D.insert x () s
 
     let member x s =
       (*failwith "Unimplemented"*)
-      List.mem_assoc x s 
+      D.member x s 
 
     let remove x s =
       (*failwith "Unimplemented"*)
-      let exists = List.mem_assoc x s in
-
-      if exists then List.remove_assoc x s 
-      else s
+      D.remove x s
 
     let choose s =
       (*failwith "Unimplemented"*)
-      let l = size s in 
-      let n = Random.int l in 
-      
-      match s with
-      | [] -> None
-      | h::t -> Some (List.nth s n)
+      let tup = D.choose s in 
+      match tup with
+      | None -> None
+      | Some (a,b) -> Some a
 
     let fold f init s =
       (*failwith "Unimplemented"*)
-      List.fold_left (fun acc (x,()) -> f x acc) init s
+      List.fold_left (fun acc ((x : elt),()) -> f x acc) init s
 
     let union s1 s2 =
       failwith "Unimplemented"
