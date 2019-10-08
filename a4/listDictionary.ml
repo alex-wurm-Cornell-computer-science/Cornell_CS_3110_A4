@@ -33,7 +33,7 @@ module Make : DictionaryMaker
     let rep_ok d =
       (*failwith "Unimplemented"*)
       d
-      
+
     let empty = 
       [] (* TODO: replace [()] with a value of your rep type [t]. *)
 
@@ -88,7 +88,8 @@ module Make : DictionaryMaker
 
     let fold f init d =
       (*failwith "Unimplemented"*)
-      List.fold_left (fun acc (k,v) -> f k v acc) init d
+      to_list d |>
+      List.fold_left (fun acc (k,v) -> f k v acc) init
 
     let format fmt d =
       (*Format.fprintf fmt "<unimplemented>"*)

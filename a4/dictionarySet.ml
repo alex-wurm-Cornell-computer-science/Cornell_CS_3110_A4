@@ -1,5 +1,15 @@
 open Dictionary
 
+(** [format_elt_list fmt_key fmt lst] formats an element 
+    list [lst] as a dictionary. The [fmt_key] argument
+    is a formatter for the key type. The
+    [fmt] argument is where to put the formatted output. *)
+let format_elt_list format_elt fmt lst =
+  Format.fprintf fmt "[";
+  List.iter (fun (k,v) -> Format.fprintf fmt "%a; "
+                format_elt k) lst;
+  Format.fprintf fmt "]"
+
 module type ElementSig = sig
   type t
   include Dictionary.KeySig with type t := t
@@ -47,9 +57,9 @@ module Make =
     (** AF: TODO: document the abstraction function.
         RI: TODO: document any representation invariants. *)
 
-    module D = DM(Elt)(Un)
+    module Dict = DM(Elt)(Un)
 
-    type t = D.t
+    type t = Dict.t
 
     let compare x y =
     match Elt.compare (fst x) (fst y) with
@@ -63,39 +73,40 @@ module Make =
 
     let empty =
       (* TODO: replace [()] with a value of your rep type [t]. *)
-      D.empty
+      Dict.empty
 
     let is_empty s =
       (*failwith "Unimplemented"*)
-      if s = D.empty then true else false
+      Dict.is_empty s
 
     let size s =
       (*failwith "Unimplemented"*)
-      D.size s
+      Dict.size s
 
     let insert x s =
       (*failwith "Unimplemented"*)
-      D.insert x () s
+      Dict.insert x () s
 
     let member x s =
       (*failwith "Unimplemented"*)
-      D.member x s 
+      Dict.member x s 
 
     let remove x s =
       (*failwith "Unimplemented"*)
-      D.remove x s
+      Dict.remove x s
 
     let choose s =
       (*failwith "Unimplemented"*)
-      let tup = D.choose s in 
+      let tup = Dict.choose s in 
       match tup with
       | None -> None
       | Some (a,b) -> Some a
 
     let fold f init s =
       (*failwith "Unimplemented"*)
-      List.fold_left (fun acc ((x : elt),()) -> f x acc) init s
-
+      Dict.fold (fun k v acc -> f k acc) init s
+      (* List.fold_left (fun acc (x,()) -> f x acc) init *)
+    
     let union s1 s2 =
       failwith "Unimplemented"
 
@@ -107,8 +118,9 @@ module Make =
 
     let to_list s =
       (*failwith "Unimplemented"*)
-      List.sort compare s
+      Dict.to_list s |> List.map fst
 
     let format fmt d =
-      Format.fprintf fmt "<unimplemented>" 
+      (* Format.fprintf fmt "<unimplemented>"  *)
+      d |> Dict.to_list |> format_elt_list Elt.format fmt
   end

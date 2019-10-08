@@ -29,6 +29,10 @@ module type Set = sig
   (** [un] is the type of units in the set. *)
   type un = Un.t
 
+
+  (** [un] is the type of units in the set. *)
+  (* module D = ListDictionary.DictionaryMaker(Elt)(Un).t *)
+
   (** [t] is the type of sets. *)
   type t
 
