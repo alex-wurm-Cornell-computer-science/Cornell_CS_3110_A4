@@ -7,14 +7,15 @@ end
 
 module Unit = struct
   type t = unit
-  (* include Dictionary.ValueSig with type t := t *)
+  let format fmt d =
+      Format.fprintf fmt "()"
 end
 
 module type Set = sig
   module Elt : ElementSig
   type elt = Elt.t
-  (* module Un : UnitSig *)
-  (* type un = Un.t *)
+  module Un = Unit
+  type un = Un.t
   type t
   val rep_ok : t  -> t
   val empty : t
@@ -35,7 +36,6 @@ end
 module Make =
   functor (E : ElementSig) ->
   functor (DM : DictionaryMaker) ->
-  
   struct
     module Elt = E
     module Un = Unit
@@ -53,7 +53,8 @@ module Make =
       s
 
     let empty =
-      [] (* TODO: replace [()] with a value of your rep type [t]. *)
+      (* TODO: replace [()] with a value of your rep type [t]. *)
+      []
 
     let is_empty s =
       (*failwith "Unimplemented"*)
