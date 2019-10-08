@@ -108,10 +108,36 @@ module Make =
       (* List.fold_left (fun acc (x,()) -> f x acc) init *)
     
     let union s1 s2 =
-      failwith "Unimplemented"
+      (* failwith "Unimplemented" *)
+      
+      let rec unite_sets d1 d2 = 
+        
+        let l2 = Dict.to_list d2 in 
+
+        match l2 with
+        | [] -> Dict.empty
+        | h::t -> let new_d1 = Dict.insert (fst h) (snd h) d1 in
+                  let new_d2 = Dict.remove (fst h) d2 in 
+                  unite_sets new_d1 new_d2
+      in 
+
+      unite_sets s1 s2
 
     let intersect s1 s2 =
       failwith "Unimplemented"
+
+      (* let rec intersect_sets d1 d2 =
+
+        let l1 = Dict.to_list d1 in 
+        let l2 = Dict.to_list d2 in 
+
+        match l2 with
+        | [] -> Dict.empty
+        | h::t -> if List.mem (fst h) l1 && not (List.mem (fst h) l2) 
+                  then let new_d1 = Dict.remove (fst h) d1 in
+                        intersect_sets new_d1 d2
+                  else  *)
+
 
     let difference s1 s2 =
       failwith "Unimplemented"
