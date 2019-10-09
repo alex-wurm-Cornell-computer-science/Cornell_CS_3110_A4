@@ -70,13 +70,22 @@ module Make =
             let f = (Unix.readdir dir) in 
             if Str.string_match valid_file_name f 0 then
               iter_dir dir (f::acc) else iter_dir dir acc
-          with End_of_file -> Unix.closedir dir; acc;
+          with End_of_file -> Unix.closedir dir; acc
         in
 
-        try
+        (* try
           let dir_handle = Unix.opendir d in 
-          (* iter_dir dir_handle [] *)
-        with Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found)
+          iter_dir dir_handle []
+        with Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found) *)
+
+        let rec iter_file in_chan =
+          try (*let line = input_line in_chan in *)
+              (* break_words line  *)
+              iter_file in_chan
+          with End_of_file -> close_in in_chan;
+        in  
+
+        let in_chan = open_in fil in iter_file fil
 
         let file_list = iter_dir d [] in 
         let idx_dict = D.empty in 
@@ -86,7 +95,7 @@ module Make =
         let rec words_from_files files acc =
           match files with
             | [] -> acc
-            | h::t -> 
+            | h::t -> acc
 
 
       let words idx = 
