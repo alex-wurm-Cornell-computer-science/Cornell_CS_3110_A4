@@ -25,30 +25,27 @@ module Make : DictionaryMaker
     type t = (key * value) list
 
     let compare x y =
-    match Key.compare (fst x) (fst y) with
-    | LT -> -1
-    | EQ -> 0
-    | GT -> 1
+      match Key.compare (fst x) (fst y) with
+      | LT -> -1
+      | EQ -> 0
+      | GT -> 1
 
     let rep_ok d =
-      (*failwith "Unimplemented"*)
+      (* Might want to reinforce no dups ? *)
       d
 
     let empty = 
-      [] (* TODO: replace [()] with a value of your rep type [t]. *)
+      []
 
     let is_empty d =
-      (*failwith "Unimplemented"*)
       match d with
       | [] -> true
       | h::t -> false
 
     let size d =
-      (*failwith "Unimplemented"*)
       List.length d
 
     let insert k v d =
-      (*failwith "Unimplemented"*)
       let exists = List.mem_assoc k d in
 
       if exists then let trim_dict = List.remove_assoc k d in 
@@ -56,38 +53,32 @@ module Make : DictionaryMaker
       else (k,v) :: d
 
     let remove k d =
-      (*failwith "Unimplemented"*)
       let exists = List.mem_assoc k d in
 
       if exists then List.remove_assoc k d 
       else d
 
     let find k d =
-      (*failwith "Unimplemented"*)
       let exists = List.mem_assoc k d in
 
       if exists then Some (List.assoc k d)
       else None
 
     let member k d =
-      (*failwith "Unimplemented"*)
       List.mem_assoc k d
 
     let choose d =
-      (*failwith "Unimplemented"*)
       let l = size d in 
       let n = Random.int l in 
-      
+
       match d with
       | [] -> None
       | h::t -> Some (List.nth d n)
 
     let to_list d =
-      (*failwith "Unimplemented"*)
       List.sort compare d
 
     let fold f init d =
-      (*failwith "Unimplemented"*)
       to_list d |>
       List.fold_left (fun acc (k,v) -> f k v acc) init
 
