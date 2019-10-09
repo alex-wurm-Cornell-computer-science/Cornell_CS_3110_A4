@@ -29,7 +29,7 @@ module Make =
       (* TODO: replace [unit] with a type of your own design. *)
       (** AF: TODO: document the abstraction function.
           RI: TODO: document any representation invariants. *)
-      type idx = string list
+      type idx = D.t
 
       let index_of_dir d =
         (* failwith "Unimplemented" *)
@@ -47,21 +47,60 @@ module Make =
         match dir_handle with
         | Unix.Unix_error (Unix.ENOENT) ("opendir") (d) -> raise (Not_found)
         | dir_handle ->  *)
-
+(* 
         let rec iter_dir d acc =
           try 
             let f = (Unix.readdir d) in 
-            let r = Str.regexp "^.*\\.txt$" in
+            let  = Str.regexp "^.*\\.txt$" in
             if Str.string_match r f 0 then
               iter_dir d (f::acc) else iter_dir d acc
           with End_of_file -> Unix.closedir d; acc;
         in
 
         let dir_handle = Unix.opendir d in
-        iter_dir dir_handle []
+        iter_dir dir_handle [] *)
+
+        let valid_file_name = Str.regexp "^.*\\.txt$" in
+        let valid_preword = Str.regexp "\\S+" in
+        let valid_word = Str.regexp "(\\w)|\\w(\\S+?)\\w" in 
+
+
+        let rec iter_dir dir acc =
+          try 
+            let f = (Unix.readdir dir) in 
+            if Str.string_match valid_file_name f 0 then
+              iter_dir dir (f::acc) else iter_dir dir acc
+          with End_of_file -> Unix.closedir dir; acc;
+        in
+
+        try
+          let dir_handle = Unix.opendir d in 
+          (* iter_dir dir_handle [] *)
+        with Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found)
+
+        let file_list = iter_dir d [] in 
+        let idx_dict = D.empty in 
+
+        let words_of_file f =
+          
+        let rec words_from_files files acc =
+          match files with
+            | [] -> acc
+            | h::t -> 
+
 
       let words idx = 
         failwith "Unimplemented"
+         
+        (* let word = Str.regexp "^\\w\\S\\w$" in 
+
+         let rec read_words wlist acc = 
+          match wlist with
+          | [] -> acc
+          | h::t -> if Str.string_match h word 0 then read_words t (h :: acc) else
+
+        in
+       *)
 
       let to_list idx =
         failwith "Unimplemented"
