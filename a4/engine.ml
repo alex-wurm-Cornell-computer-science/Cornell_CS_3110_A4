@@ -47,7 +47,7 @@ module Make =
         match dir_handle with
         | Unix.Unix_error (Unix.ENOENT) ("opendir") (d) -> raise (Not_found)
         | dir_handle ->  *)
-(* 
+        (* 
         let rec iter_dir d acc =
           try 
             let f = (Unix.readdir d) in 
@@ -72,44 +72,60 @@ module Make =
               iter_dir dir (f::acc) else iter_dir dir acc
           with End_of_file -> Unix.closedir dir; acc
         in
+        let rec break_words file line = 
+          if Str.string_match valid_preword line 0 then (
+            let prewords = Str.split valid_preword line in 
+            match prewords with
+            | [] -> ()
+            | h::t ->
+              if Str.string_match valid_word h 0 then (
+                let words = Str.split valid_word h in 
+                match words with 
+                | [] -> ()
+                | h::t -> () (* word, needs to be inserted to idx *)
+              ) else ()
+          ) else ()
+        in 
 
-        (* try
-          let dir_handle = Unix.opendir d in 
-          iter_dir dir_handle []
-        with Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found) *)
-
-        let rec iter_file in_chan =
-          try (*let line = input_line in_chan in *)
-              (* break_words line  *)
-              iter_file in_chan
+        let rec iter_file f in_chan =
+          try 
+            let line = input_line in_chan in 
+            break_words line f;
+            iter_file f in_chan
           with End_of_file -> close_in in_chan;
         in  
 
+
+        (* try
+           (* let dir_handle = Unix.opendir d in  *)
+           iter_dir dir_handle []
+           with Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found) *)
+
         let in_chan = open_in fil in iter_file fil
 
-        let file_list = iter_dir d [] in 
-        let idx_dict = D.empty in 
+      let file_list = iter_dir d [] in 
+      let idx_dict = D.empty in 
 
-        let words_of_file f =
-          
+      let words_of_file f =
+
         let rec words_from_files files acc =
           match files with
-            | [] -> acc
-            | h::t -> acc
+          | [] -> acc
+          | h::t -> acc
 
 
       let words idx = 
         failwith "Unimplemented"
-         
-        (* let word = Str.regexp "^\\w\\S\\w$" in 
+
+      (* let word = Str.regexp "^\\w\\S\\w$" in 
 
          let rec read_words wlist acc = 
-          match wlist with
-          | [] -> acc
-          | h::t -> if Str.string_match h word 0 then read_words t (h :: acc) else
+         match wlist with
+         | [] -> acc
+         | h::t -> if Str.string_match h word 0 then read_words t (h :: acc) else
 
-        in
-       *)
+         in
+      *)
 
       let to_list idx =
         failwith "Unimplemented"
