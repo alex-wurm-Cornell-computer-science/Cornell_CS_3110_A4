@@ -16,10 +16,21 @@ module Make =
       (* TODO: replace [unit] with a type of your own design. *)
       (** AF: TODO: document the abstraction function.
           RI: TODO: document any representation invariants. *)
-      type idx = unit
+      type idx = string list
 
       let index_of_dir d =
-        failwith "Unimplemented"
+        (* failwith "Unimplemented" *)
+        let rec add_file dir_handle acc = 
+          try 
+            let file_name = Unix.readdir dir_handle in 
+            let r = Str.regexp "^.*\\.txt$" in
+            if Str.string_match r file_name 0 then
+              add_file dir_handle (file_name::acc)
+            else add_file dir_handle acc
+          with | End_of_file -> raise Not_found
+        in
+
+        add_file (Unix.opendir d) []
 
       let words idx = 
         failwith "Unimplemented"

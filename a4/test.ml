@@ -1,8 +1,5 @@
 open OUnit2
 open ListDictionary
-
-(* of course add whatever code you want *)
-
 open Dictionary
 
 module Int = struct
@@ -237,9 +234,32 @@ let dictionary_set_tests = [
   make_dictset_fold "fold: sum of dict with one element" (fun k acc -> k*2 + acc) 0 dset_add_2b 36;
 ]
 
+module String = struct
+  type t = string
+  let compare x y =
+    match Stdlib.compare x y with
+    | x when x<0 -> LT
+    | 0 -> EQ
+    | _ -> GT
+  let format fmt x =
+    Format.fprintf fmt "%s" x
+end;;
+
+(* module DictSet = DictionarySet.Make(String)(ListDictionary.Make)
+   module Dict = ListDictionary.Make(String)(ListDictionary.Make(String)(String))
+   module Eng = Engine.Make(DictSet)(Dict) *)
+
+module S = DictionarySet.Make(String)(ListDictionary.Make)
+module D = ListDictionary.Make(String)(S.t)
+
+let engine_tests = [
+
+]
+
 let suite = "search test suite" >::: List.flatten [ 
     list_dictionary_tests;
     dictionary_set_tests;
+    engine_tests;
   ]
 
 let _ = run_test_tt_main suite
