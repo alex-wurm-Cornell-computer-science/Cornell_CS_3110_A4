@@ -245,16 +245,21 @@ module String = struct
     Format.fprintf fmt "%s" x
 end;;
 
-(* module DictSet = DictionarySet.Make(String)(ListDictionary.Make)
-   module Dict = ListDictionary.Make(String)(ListDictionary.Make(String)(String))
-   module Eng = Engine.Make(DictSet)(Dict) *)
-
 module S = DictionarySet.Make(String)(ListDictionary.Make)
 module D = ListDictionary.Make(String)(DictionarySet.Make(String)(ListDictionary.Make))
 module E = Engine.Make(S)(D)
 
-let engine_tests = [
+let make_index_of_dir
+    (name : string)
+    (dir : string)
+    (expected_output : E.idx): test = 
+  name >:: (fun _ ->
+      assert_equal expected_output (E.index_of_dir dir))
 
+let index_txt = D.insert
+
+let engine_tests = [
+  (* make_index_of_dir "sample directory of only .txt files" "../texts" index_txt; *)
 ]
 
 let suite = "search test suite" >::: List.flatten [ 
