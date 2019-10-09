@@ -18,7 +18,7 @@ end
 module Unit = struct
   type t = unit
   let format fmt d =
-      Format.fprintf fmt "()"
+    Format.fprintf fmt "()"
 end
 
 module type Set = sig
@@ -62,10 +62,10 @@ module Make =
     type t = Dict.t
 
     let compare x y =
-    match Elt.compare (fst x) (fst y) with
-    | LT -> -1
-    | EQ -> 0
-    | GT -> 1
+      match Elt.compare (fst x) (fst y) with
+      | LT -> -1
+      | EQ -> 0
+      | GT -> 1
 
     let rep_ok s =
       (*failwith "Unimplemented"*)
@@ -105,42 +105,53 @@ module Make =
     let fold f init s =
       (*failwith "Unimplemented"*)
       Dict.fold (fun k v acc -> f k acc) init s
-      (* List.fold_left (fun acc (x,()) -> f x acc) init *)
-    
+    (* List.fold_left (fun acc (x,()) -> f x acc) init *)
+
     let union s1 s2 =
       (* failwith "Unimplemented" *)
-      
+
       let rec unite_sets d1 d2 = 
-        
+
         let l2 = Dict.to_list d2 in 
 
         match l2 with
         | [] -> Dict.empty
         | h::t -> let new_d1 = Dict.insert (fst h) (snd h) d1 in
-                  let new_d2 = Dict.remove (fst h) d2 in 
-                  unite_sets new_d1 new_d2
+          let new_d2 = Dict.remove (fst h) d2 in 
+          unite_sets new_d1 new_d2
       in 
 
       unite_sets s1 s2
 
     let intersect s1 s2 =
-      failwith "Unimplemented"
+      (* failwith "Unimplemented" *)
 
-      (* let rec intersect_sets d1 d2 =
+      let rec intersect_sets d1 d2 acc =
 
         let l1 = Dict.to_list d1 in 
-        let l2 = Dict.to_list d2 in 
-
-        match l2 with
+        match l1 with
         | [] -> Dict.empty
-        | h::t -> if List.mem (fst h) l1 && not (List.mem (fst h) l2) 
-                  then let new_d1 = Dict.remove (fst h) d1 in
-                        intersect_sets new_d1 d2
-                  else  *)
+        | h::t -> if Dict.member (fst h) d2 then 
+            intersect_sets (Dict.remove (fst h) d1) d2 
+              (Dict.insert (fst h) (snd h) acc) 
+          else intersect_sets (Dict.remove (fst h) d1) d2 acc
+      in 
 
+      intersect_sets s1 s2 Dict.empty
 
     let difference s1 s2 =
-      failwith "Unimplemented"
+      let rec difference_sets d1 d2 acc =
+
+        let l1 = Dict.to_list d1 in 
+        match l1 with
+        | [] -> Dict.empty
+        | h::t -> if not (Dict.member (fst h) d2) then 
+            difference_sets (Dict.remove (fst h) d1) d2 
+              (Dict.insert (fst h) (snd h) acc) 
+          else difference_sets (Dict.remove (fst h) d1) d2 acc
+      in 
+
+      difference_sets s1 s2 Dict.empty
 
     let to_list s =
       (*failwith "Unimplemented"*)
