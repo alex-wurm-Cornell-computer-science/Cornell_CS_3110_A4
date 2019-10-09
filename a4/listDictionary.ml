@@ -6,7 +6,7 @@ open Dictionary
     [fmt] argument is where to put the formatted output. *)
 let format_assoc_list format_key format_val fmt lst =
   Format.fprintf fmt "[";
-  List.iter (fun (k,v) -> Format.fprintf fmt "%a -> %a; "
+  List.iter (fun (k,v) -> Format.fprintf fmt "%a, %a;"
                 format_key k format_val v) lst;
   Format.fprintf fmt "]"
 
@@ -67,13 +67,18 @@ module Make : DictionaryMaker
     let member k d =
       List.mem_assoc k d
 
-    let choose d =
-      let l = size d in 
-      let n = Random.int l in 
-
+    let rec keyList d acc = 
       match d with
-      | [] -> None
-      | h::t -> Some (List.nth d n)
+      | [] -> acc
+      | (h:'a*'b)::t -> (fst h)::acc
+
+    let choose (d:t) =
+      let l = size d in 
+      let n = if l = 0 then 0 else Random.int l in
+      if n = 0 && l = 0 then None else
+        match d with
+        | [] -> None
+        | h::t -> Some (List.nth d n)
 
     let to_list d =
       List.sort compare d
@@ -83,6 +88,5 @@ module Make : DictionaryMaker
       List.fold_left (fun acc (k,v) -> f k v acc) init
 
     let format fmt d =
-      (*Format.fprintf fmt "<unimplemented>"*)
       format_assoc_list Key.format Value.format fmt d
   end
