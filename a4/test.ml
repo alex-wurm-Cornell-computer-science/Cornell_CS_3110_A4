@@ -250,7 +250,8 @@ end;;
    module Eng = Engine.Make(DictSet)(Dict) *)
 
 module S = DictionarySet.Make(String)(ListDictionary.Make)
-module D = ListDictionary.Make(String)(S.t)
+module D = ListDictionary.Make(String)(DictionarySet.Make(String)(ListDictionary.Make))
+module E = Engine.Make(S)(D)
 
 let engine_tests = [
 
