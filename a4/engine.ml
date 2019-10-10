@@ -108,28 +108,39 @@ module Make =
         get_words idx []
 
       let to_list idx =
-        failwith "Unimplemented"
+        (*failwith "Unimplemented"*)
       (* D.to_list idx  *)
+        let rec get_pairs idx acc = 
+          let tmp = D.choose idx in 
+          match tmp with 
+          | None -> acc
+          | Some s -> let k = (fst s) in 
+                      let v = S.to_list (snd s) in 
+                      get_pairs (D.remove k idx) ((k,v)::acc)
+        in 
+
+        get_pairs idx []
 
       let or_not idx ors nots =
         (* failwith "Unimplemented" *)
+
         let rec acc_ors ors_lst idx acc =
           match ors_lst with 
           | [] -> acc 
           | h::t -> if D.member h idx then (
-              match D.find h idx with 
-              | None -> acc_ors t idx acc 
-              | Some s -> acc_ors t (D.remove h idx) (s::acc)
-
-            )
-            else acc_ors t idx acc 
+                      match D.find h idx with 
+                      | None -> acc_ors t idx acc 
+                      | Some s -> acc_ors t (D.remove h idx) ((S.to_list s) :: acc)
+                      )
+                    else acc_ors t idx acc 
         in 
 
         let rec rem_nots nots_lst acc =
           match nots_lst with 
           | [] -> acc 
           | h::t -> if List.mem h acc then 
-              rem_nots t (List.filter (fun x -> x <> h) acc) else rem_nots t acc 
+                    rem_nots t (List.filter (fun x -> x <> h) acc)
+                    else rem_nots t acc 
         in 
 
         rem_nots nots (acc_ors ors idx [])
