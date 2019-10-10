@@ -130,7 +130,8 @@ module Make =
           | h::t -> if D.member h idx then (
                       match D.find h idx with 
                       | None -> acc_ors t idx acc 
-                      | Some s -> acc_ors t (D.remove h idx) ((S.to_list s) :: acc)
+                      | Some s -> let new_acc = s |> S.to_list |> List.append acc in 
+                                  acc_ors t (D.remove h idx) new_acc
                       )
                     else acc_ors t idx acc 
         in 
