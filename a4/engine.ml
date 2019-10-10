@@ -62,7 +62,9 @@ module Make =
 
         let valid_file_name = Str.regexp "^.*\\.txt$" in
         let valid_preword = Str.regexp "\\S+" in
-        let valid_word = Str.regexp "(\\w)|\\w(\\S+?)\\w" in 
+        let valid_word = Str.regexp "[A-Za-z0-9(\\S*?)[A-Za-z0-9]|[A-Za-z0-9]" in 
+        let whitespace = Str.regexp "\\s+" in 
+        let boundary_character = Str.regexp "[A-Z-a-z0-9]" in 
 
 
         let rec iter_dir dir acc =
@@ -72,27 +74,52 @@ module Make =
               iter_dir dir (f::acc) else iter_dir dir acc
           with End_of_file -> Unix.closedir dir; acc
         in
-        let rec break_words file line = 
-          if Str.string_match valid_preword line 0 then (
-            let prewords = Str.split valid_preword line in 
+
+        let preword_to_word p = 
+          try
+            let len = String.length p in 
+            let n1 = Str.search_forward boundary_character p 0 in 
+            let n2 = Str.search_forward boundary_character p len in 
+            let sub_len = (n2 - n1) + 1 in 
+            String.sub p n1 sub_len 
+          with
+            | Not_found -> ""
+        in 
+
+        let rec break_and_insert file prewords dict = 
+          (* if Str.string_match valid_preword line 0 then  *)
             match prewords with
-            | [] -> ()
+            | [] -> dict
             | h::t ->
-              if Str.string_match valid_word h 0 then (
-                let words = Str.split valid_word h in 
-                match words with 
+                      let next_word = preword_to_word h in 
+                      if D.member next_word dict then 
+                        let curr_file_set = dict |> D.find next_word |> Option.get in 
+                        let new_file_set = S.insert file curr_file_set in 
+                        let new_dict = D.insert next_word new_file_set dict in 
+                        break_and_insert file t new_dict
+                      else 
+                        let init_file_set = S.empty in 
+                        let new_file_set = S.insert file init_file_set in 
+                        let new_dict = D.insert next_word new_file_set dict in 
+                        break_and_insert file t new_dict
+        in 
+(* 
+                match word with 
                 | [] -> ()
                 | h::t -> () (* word, needs to be inserted to idx *)
               ) else ()
-          ) else ()
+           else ()
         in 
 
-        let rec iter_file f in_chan =
+         *)
+
+        let rec iter_file f in_chan dict =
           try 
             let line = input_line in_chan in 
-            break_words line f;
-            iter_file f in_chan
-          with End_of_file -> close_in in_chan;
+            let prewords = Str.split whitespace line in 
+            let updated_dict = break_and_insert f prewords dict in 
+            iter_file f in_chan updated_dict
+          with End_of_file -> close_in in_chan; dict
         in  
 
 
