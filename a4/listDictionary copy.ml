@@ -6,7 +6,7 @@ open Dictionary
     [fmt] argument is where to put the formatted output. *)
 let format_assoc_list format_key format_val fmt lst =
   Format.fprintf fmt "[";
-  List.iter (fun (k,v) -> Format.fprintf fmt "%a -> %a;"
+  List.iter (fun (k,v) -> Format.fprintf fmt "%a, %a;"
                 format_key k format_val v) lst;
   Format.fprintf fmt "]"
 
