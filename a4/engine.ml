@@ -73,8 +73,10 @@ module Make =
         let rec iter_file f in_chan dict =
           try 
             let line = input_line in_chan in 
-            let prewords = List.filter (fun x -> (x = "") = false) (Stdlib.String.split_on_char ' ' line) in(*Str.split whitespace line in  *)
-            let updated_dict = break_and_insert f prewords dict in 
+            let prewords = (Stdlib.String.split_on_char ' ' line) in (*Str.split whitespace line in  *)
+            let all_words = List.map preword_to_word prewords in 
+            let words = List.filter (fun x -> not (x = "")) all_words in 
+            let updated_dict = break_and_insert f words dict in 
             iter_file f in_chan updated_dict
           with End_of_file -> close_in in_chan; dict
         in  
