@@ -4,11 +4,13 @@ open Dictionary
     list [lst] as a dictionary. The [fmt_key] argument
     is a formatter for the key type. The
     [fmt] argument is where to put the formatted output. *)
+(*BISECT-IGNORE-BEGIN*)
 let format_elt_list format_elt fmt lst =
   Format.fprintf fmt "[";
   List.iter (fun (k,v) -> Format.fprintf fmt "%a; "
                 format_elt k) lst;
   Format.fprintf fmt "]"
+(*BISECT-IGNORE-END*)
 
 module type ElementSig = sig
   type t
@@ -24,8 +26,6 @@ end
 module type Set = sig
   module Elt : ElementSig
   type elt = Elt.t
-  module Un = Unit
-  type un = Un.t
   type t
   val rep_ok : t  -> t
   val empty : t
@@ -53,14 +53,15 @@ module Make =
     type un = Un.t 
 
     (** Abstraction function: the Dictionary Set [a1; ...; an] represents
-    the dictionary with keys of set {a1, ..., an} and values of ().  
-    [] represents the empty Dictionary Set.
-    Representation invariant: the Dictionary Set contains no duplicates. *)
+        the dictionary with keys of set {a1, ..., an} and values of ().  
+        [] represents the empty Dictionary Set.
+        Representation invariant: the Dictionary Set contains no duplicates. *)
 
     module Dict = DM(Elt)(Un)
 
     type t = Dict.t
 
+    (*BISECT-IGNORE-BEGIN*)
     let compare x y =
       match Elt.compare (fst x) (fst y) with
       | LT -> -1
@@ -72,6 +73,7 @@ module Make =
 
     let empty =
       Dict.empty
+    (*BISECT-IGNORE-END*)
 
     let is_empty s =
       Dict.is_empty s
@@ -139,9 +141,11 @@ module Make =
 
       difference_sets s1 s2 Dict.empty
 
+    (*BISECT-IGNORE-BEGIN*)
     let to_list s =
       Dict.to_list s |> List.map fst
 
     let format fmt d =
       d |> Dict.to_list |> format_elt_list Elt.format fmt
+      (*BISECT-IGNORE-END*)
   end

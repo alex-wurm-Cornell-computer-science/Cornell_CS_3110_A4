@@ -1,8 +1,3 @@
-(** [format_assoc_list fmt_key fmt_val fmt lst] formats an association 
-    list [lst] as a dictionary.  The [fmt_key] and [fmt_val] arguments
-    are formatters for the key and value types, respectively.  The
-    [fmt] argument is where to put the formatted output. *)
-
 module type Engine = sig
   type idx
   val index_of_dir : string -> idx
@@ -18,13 +13,13 @@ module Make =
     -> functor (D:Dictionary.Dictionary with type Key.t = string
                                          and type Value.t = S.t) 
     -> struct
-    
-    (** Abstraction function: the Engine [a1 -> [b1]; ...; an -> [bn]] represents
-    the dictionary with keys of set {a1, ..., an} and values of set 
-    {b1, ..., bn} each representing a Dictionary Set.  
-    [] represents the empty Engine.
-    Representation invariant: the Engine contains no duplicates. all keys
-    are lowercase ascii. *)
+
+      (** Abstraction function: the Engine [a1 -> [b1]; ...; an -> [bn]] represents
+          the dictionary with keys of set {a1, ..., an} and values of set 
+          {b1, ..., bn} each representing a Dictionary Set.  
+          [] represents the empty Engine.
+          Representation invariant: the Engine contains no duplicates. all keys
+          are lowercase ascii. *)
 
       type idx = D.t
 
@@ -183,8 +178,10 @@ module Make =
 
         rem_nots nots (to_list idx) (acc_ands ands (to_list idx) [])
 
+      (*BISECT-IGNORE-BEGIN*)
       let format fmt idx =
         D.format fmt idx
+        (*BISECT-IGNORE-END*)
 
 
     end

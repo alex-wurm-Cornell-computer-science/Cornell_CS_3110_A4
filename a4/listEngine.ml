@@ -14,6 +14,7 @@ struct
 
   (** [compare s1 s2] implements a comparison function, as 
       required by [Dictionary.Comparable.compare]. *)
+  (*BISECT-IGNORE-BEGIN*)
   let compare s1 s2 =
     match Stdlib.compare s1 s2 with
     | x when x < 0 -> LT
@@ -23,6 +24,7 @@ struct
   (** [format fmt s] prints string [s] on formatter [fmt] *)
   let format fmt s =
     Format.fprintf fmt "\"%s\"" s
+    (*BISECT-IGNORE-END*)
 end
 
 (** [S] is a dictionary set implemented with a [ListDictionary]

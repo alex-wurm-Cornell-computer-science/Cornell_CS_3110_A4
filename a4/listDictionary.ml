@@ -4,11 +4,13 @@ open Dictionary
     list [lst] as a dictionary.  The [fmt_key] and [fmt_val] arguments
     are formatters for the key and value types, respectively.  The
     [fmt] argument is where to put the formatted output. *)
+(*BISECT-IGNORE-BEGIN*)
 let format_assoc_list format_key format_val fmt lst =
   Format.fprintf fmt "[";
   List.iter (fun (k,v) -> Format.fprintf fmt "%a -> %a;"
                 format_key k format_val v) lst;
   Format.fprintf fmt "]"
+(*BISECT-IGNORE-END*)
 
 module Make : DictionaryMaker
   = functor (K : KeySig) -> functor (V : ValueSig) ->
@@ -19,12 +21,13 @@ module Make : DictionaryMaker
     type value = V.t
 
     (** Abstraction function: the List Dictionary [a1 -> b1; ...; an -> bn] 
-    represents the dictionary with keys of set {a1, ..., an} and values of set 
-    {b1, ..., bn}. [] represents the empty List Dictionary.
-    Representation invariant: the List Dictionary contains no duplicates. *)
+        represents the dictionary with keys of set {a1, ..., an} and values of set 
+        {b1, ..., bn}. [] represents the empty List Dictionary.
+        Representation invariant: the List Dictionary contains no duplicates. *)
 
     type t = (key * value) list
 
+    (*BISECT-IGNORE-BEGIN*)
     let compare x y =
       match Key.compare (fst x) (fst y) with
       | LT -> -1
@@ -36,6 +39,7 @@ module Make : DictionaryMaker
 
     let empty = 
       []
+    (*BISECT-IGNORE-END*)
 
     let is_empty d =
       match d with
@@ -80,13 +84,17 @@ module Make : DictionaryMaker
         | [] -> None
         | h::t -> Some (List.nth d n)
 
+    (*BISECT-IGNORE-BEGIN*)
     let to_list d =
       List.sort compare d
+    (*BISECT-IGNORE-END*)
 
     let fold f init d =
       to_list d |>
       List.fold_left (fun acc (k,v) -> f k v acc) init
 
+    (*BISECT-IGNORE-BEGIN*)
     let format fmt d =
       format_assoc_list Key.format Value.format fmt d
+      (*BISECT-IGNORE-END*)
   end
