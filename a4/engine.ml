@@ -24,7 +24,6 @@ module Make =
       type idx = D.t
 
       let index_of_dir d =
-        (* failwith "Unimplemented" *)
 
         let valid_file_name = Str.regexp "^.*\\.txt$" in
         (* let valid_preword = Str.regexp "\\S+" in
@@ -96,7 +95,6 @@ module Make =
           Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found)
 
       let words idx = 
-        (* failwith "Unimplemented" *)
 
         let rec get_words idx (acc:string list) = 
           let tmp = D.choose idx in 
@@ -108,49 +106,79 @@ module Make =
         get_words idx []
 
       let to_list idx =
-        (*failwith "Unimplemented"*)
-      (* D.to_list idx  *)
+
         let rec get_pairs idx acc = 
           let tmp = D.choose idx in 
           match tmp with 
           | None -> acc
           | Some s -> let k = (fst s) in 
-                      let v = S.to_list (snd s) in 
-                      get_pairs (D.remove k idx) ((k,v)::acc)
+            let v = S.to_list (snd s) in 
+            get_pairs (D.remove k idx) ((k,v)::acc)
         in 
 
         get_pairs idx []
 
       let or_not idx ors nots =
-        (* failwith "Unimplemented" *)
 
-        let rec acc_ors ors_lst idx acc =
+        let rec acc_ors ors_lst idx_lst acc =
           match ors_lst with 
+          | [] -> List.flatten acc
+          | h::t -> if List.mem_assoc h idx_lst then 
+              match List.assoc_opt h idx_lst with 
+              | None -> acc_ors t idx_lst acc 
+              | Some s -> acc_ors t idx_lst (s::acc)
+            else acc_ors t idx_lst acc
+        in
+
+        let rec remove lst acc =
+          match lst with 
           | [] -> acc 
-          | h::t -> if D.member h idx then (
-                      match D.find h idx with 
-                      | None -> acc_ors t idx acc 
-                      | Some s -> let new_acc = s |> S.to_list |> List.append acc |> List.sort_uniq compare in 
-                                  acc_ors t (D.remove h idx) new_acc
-                      )
-                    else acc_ors t idx acc 
+          | h::t -> remove t (List.filter (fun x -> x <> h) acc)
         in 
 
-        let rec rem_nots nots_lst acc =
+        let rec rem_nots nots_lst idx_lst acc =
           match nots_lst with 
-          | [] -> acc 
-          | h::t -> if List.mem h acc then 
-                    rem_nots t (List.filter (fun x -> x <> h) acc)
-                    else rem_nots t acc 
+          | [] -> List.sort_uniq compare acc
+          | h::t -> if List.mem_assoc h idx_lst then 
+              match List.assoc_opt h idx_lst with 
+              | None -> rem_nots t idx_lst acc 
+              | Some s -> rem_nots t idx_lst (remove s acc)
+            else rem_nots t idx_lst acc 
         in 
 
-        rem_nots nots (acc_ors ors idx [])
+        rem_nots nots (to_list idx) (acc_ors ors (to_list idx) [])
 
       let and_not idx ands nots =
-        failwith "Unimplemented"
+
+        let rec acc_ands ands_lst idx_lst acc =
+          match ands_lst with 
+          | [] -> List.flatten acc
+          | h::t -> if List.mem_assoc h idx_lst then 
+              match List.assoc_opt h idx_lst with 
+              | None -> acc_ands t idx_lst []
+              | Some s -> acc_ands t idx_lst (s::acc)
+            else acc_ands t idx_lst []
+        in
+
+        let rec remove lst acc =
+          match lst with 
+          | [] -> acc 
+          | h::t -> remove t (List.filter (fun x -> x <> h) acc)
+        in 
+
+        let rec rem_nots nots_lst idx_lst acc =
+          match nots_lst with 
+          | [] -> List.sort_uniq compare acc
+          | h::t -> if List.mem_assoc h idx_lst then 
+              match List.assoc_opt h idx_lst with 
+              | None -> rem_nots t idx_lst acc 
+              | Some s -> rem_nots t idx_lst (remove s acc)
+            else rem_nots t idx_lst acc 
+        in 
+
+        rem_nots nots (to_list idx) (acc_ands ands (to_list idx) [])
 
       let format fmt idx =
-        (* format_list format_string fmt idx *)
         D.format fmt idx
 
 
