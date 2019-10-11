@@ -276,17 +276,57 @@ module S = DictionarySet.Make(String)(ListDictionary.Make)
 module D = ListDictionary.Make(String)(DictionarySet.Make(String)(ListDictionary.Make))
 module E = Engine.Make(S)(D)
 
-let make_index_of_dir
-    (name : string)
-    (dir : string)
-    (expected_output : E.idx): test = 
-  name >:: (fun _ ->
-      assert_equal expected_output (E.index_of_dir dir))
 
-let index_txt = D.insert
+
+let make_engine_words
+    (name : string)
+    (idx : E.idx)
+    (expected_output : int): test = 
+  name >:: (fun _ ->
+      assert_equal expected_output (List.length (E.words idx)))
+
+let make_or_not
+    (name : string)
+    (idx : E.idx)
+    (ors : string list)
+    (nots : string list)
+    (expected_output : string list): test =
+  name >:: (fun _ ->
+      assert_equal expected_output (E.or_not idx ors nots))
+
+let make_and_not
+    (name : string)
+    (idx : E.idx)
+    (ands : string list)
+    (nots : string list)
+    (expected_output : string list): test =
+  name >:: (fun _ ->
+      assert_equal expected_output (E.and_not idx ands nots))
+
+let alice_idx = E.index_of_dir "alice"
+let alice_words = E.words alice_idx
+let alice_ors = ["directed"; "taxes"; "as"]
+let alice_nots = ["64-6221541"; "provoking"]
+let alice_nots_2 = ["bla"]
+let preamble_idx = E.index_of_dir "preamble"
+let preamble_words = E.words preamble_idx
+let preamble_ors = ["we";"the";"people"] 
+let preamble_nots = ["america"]
+let preamble_nots_2 = ["heehee"]
 
 let engine_tests = [
-  (* make_index_of_dir "sample directory of only .txt files" "../texts" index_txt; *)
+  make_engine_words "alice directory" alice_idx 3278;
+  make_engine_words "preamble directory" preamble_idx 38;
+
+  make_or_not "or not: testing on alice" alice_idx alice_ors alice_nots [];
+  make_or_not "or not 2: testing on alice" alice_idx alice_ors alice_nots_2 ["alice.txt"];
+  make_or_not "or not: testing on preamble" preamble_idx preamble_ors preamble_nots ["prefix.txt"];
+  make_or_not "or not 2: testing on preamble" preamble_idx preamble_ors preamble_nots_2 ["prefix.txt";"whole.txt"];
+
+  make_and_not "and not: testing on alice" alice_idx alice_ors alice_nots [];
+  make_and_not "and not 2: testing on alice" alice_idx alice_ors alice_nots_2 ["alice.txt"];
+  make_and_not "and not: testing on preamble" preamble_idx preamble_ors preamble_nots ["prefix.txt"];
+  make_and_not "and not 2: testing on preamble" preamble_idx preamble_ors preamble_nots_2 ["prefix.txt";"whole.txt"];
 ]
 
 let suite = "search test suite" >::: List.flatten [ 
