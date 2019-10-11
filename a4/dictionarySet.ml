@@ -115,7 +115,7 @@ module Make =
         let l2 = Dict.to_list d2 in 
 
         match l2 with
-        | [] -> Dict.empty
+        | [] -> d1
         | h::t -> let new_d1 = Dict.insert (fst h) (snd h) d1 in
           let new_d2 = Dict.remove (fst h) d2 in 
           unite_sets new_d1 new_d2
@@ -130,7 +130,7 @@ module Make =
 
         let l1 = Dict.to_list d1 in 
         match l1 with
-        | [] -> Dict.empty
+        | [] -> d2
         | h::t -> if Dict.member (fst h) d2 then 
             intersect_sets (Dict.remove (fst h) d1) d2 
               (Dict.insert (fst h) (snd h) acc) 
@@ -144,7 +144,7 @@ module Make =
 
         let l1 = Dict.to_list d1 in 
         match l1 with
-        | [] -> Dict.empty
+        | [] -> acc
         | h::t -> if not (Dict.member (fst h) d2) then 
             difference_sets (Dict.remove (fst h) d1) d2 
               (Dict.insert (fst h) (snd h) acc) 
