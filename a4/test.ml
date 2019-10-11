@@ -157,14 +157,6 @@ let make_dictset_insert
   name >:: (fun _ ->
       assert_equal expected_output (IntDictionarySet.insert key dict))
 
-let make_dictset_remove
-    (name : string)
-    (key : int)
-    (dict : IntDictionarySet.t)
-    (expected_output : IntDictionarySet.t): test =
-  name >:: (fun _ ->
-      assert_equal expected_output (IntDictionarySet.remove key dict))
-
 let make_dictset_member
     (name : string)
     (key : int)
@@ -173,19 +165,44 @@ let make_dictset_member
   name >:: (fun _ ->
       assert_equal expected_output (IntDictionarySet.member key dict))
 
+let make_dictset_remove
+    (name : string)
+    (key : int)
+    (dict : IntDictionarySet.t)
+    (expected_output : IntDictionarySet.t): test =
+  name >:: (fun _ ->
+      assert_equal expected_output (IntDictionarySet.remove key dict))
+
+let make_dictset_union
+    (name : string)
+    (d1 : IntDictionarySet.t)
+    (d2 : IntDictionarySet.t)
+    (expected_output : IntDictionarySet.t): test = 
+  name >:: (fun _ ->
+      assert_equal expected_output (IntDictionarySet.union d1 d2))
+
+let make_dictset_intersect
+    (name : string)
+    (d1 : IntDictionarySet.t)
+    (d2 : IntDictionarySet.t)
+    (expected_output : IntDictionarySet.t): test = 
+  name >:: (fun _ ->
+      assert_equal expected_output (IntDictionarySet.intersect d1 d2))
+
+let make_dictset_difference
+    (name : string)
+    (d1 : IntDictionarySet.t)
+    (d2 : IntDictionarySet.t)
+    (expected_output : IntDictionarySet.t): test = 
+  name >:: (fun _ ->
+      assert_equal expected_output (IntDictionarySet.difference d1 d2))
+
 let make_dictset_choose
     (name : string)
     (dict : IntDictionarySet.t)
     (expected_output : int option): test = 
   name >:: (fun _ ->
       assert_equal expected_output (IntDictionarySet.choose dict))
-
-let make_dictset_to_list
-    (name : string)
-    (dict : IntDictionarySet.t)
-    (expected_output : int list): test = 
-  name >:: (fun _ ->
-      assert_equal expected_output (IntDictionarySet.to_list dict))
 
 let make_dictset_fold
     (name : string)
@@ -201,18 +218,25 @@ let dset_add_1 = IntDictionarySet.insert 1 (IntDictionarySet.empty)
 let dset_remove_1 = IntDictionarySet.remove 1 dset_add_1
 let dset_add_2a = IntDictionarySet.insert 6 dset_remove_1
 let dset_add_2b = IntDictionarySet.insert 12 dset_add_2a
+let dset_add_just12 = IntDictionarySet.insert 12 dset_empty
 let dset_add_existing = IntDictionarySet.insert 6  dset_add_2b
 
 let dictionary_set_tests = [
   make_dictset_is_empty "is_empty: created empty listdict" dset_empty true;
   make_dictset_size "size: created empty listdict" dset_empty 0;
   make_dictset_choose "choose: created empty listdict" dset_empty None;
+  make_dictset_union "union: empty set with itself" dset_empty dset_empty dset_empty;
+  make_dictset_intersect "intersect: empty set with itself" dset_empty dset_empty dset_empty;
+  make_dictset_difference "difference: empty set with itself" dset_empty dset_empty dset_empty;
 
   make_dictset_insert "insert: added one key*val pair" 1 dset_empty dset_add_1;
   make_dictset_is_empty "is_empty: added one key*val pair" dset_add_1 false;
   make_dictset_size "size: added one key*val pair" dset_add_1 1;
   make_dictset_choose "choose: from dict with one element" dset_add_1 (Some 1);
   make_dictset_fold "fold: sum of dict with one element" (fun k acc -> k*2 + acc) 0 dset_add_1 2;
+  make_dictset_union "union: empty set with set of one element" dset_add_1 dset_empty dset_add_1;
+  make_dictset_intersect "intersect: empty set with set of one element" dset_add_1 dset_empty dset_empty;
+  make_dictset_difference "difference: empty set with set of one element" dset_add_1 dset_empty dset_add_1;
 
   make_dictset_remove "remove: removed one key*val pair" 1 dset_add_1 dset_empty;
   make_dictset_is_empty "is_empty: removed one key*val pair" dset_remove_1 true;
@@ -232,6 +256,9 @@ let dictionary_set_tests = [
   make_dictset_member "member: add two of two key*val pairds" 12 dset_add_2b true;
   make_dictset_member "member: looking for nonexisting element" 10 dset_add_2b false;
   make_dictset_fold "fold: sum of dict with one element" (fun k acc -> k*2 + acc) 0 dset_add_2b 36;
+  make_dictset_union "union: two sets" dset_add_2a dset_add_2b dset_add_2b;
+  make_dictset_intersect "intersect: two sets" dset_add_2b dset_add_2a dset_add_2a;
+  make_dictset_difference "difference: two sets" dset_add_2b dset_add_2a dset_add_just12;
 ]
 
 module String = struct
