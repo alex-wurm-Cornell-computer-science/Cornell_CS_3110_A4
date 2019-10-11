@@ -26,7 +26,6 @@ module type Set = sig
   type elt = Elt.t
   module Un = Unit
   type un = Un.t
-  (* module D = Dictionary.DictionaryMaker(Elt)(Un).t *)
   type t
   val rep_ok : t  -> t
   val empty : t
@@ -53,9 +52,10 @@ module Make =
     type elt = Elt.t
     type un = Un.t 
 
-    (* TODO: change type [t] to something involving a dictionary *)
-    (** AF: TODO: document the abstraction function.
-        RI: TODO: document any representation invariants. *)
+    (** Abstraction function: the Dictionary Set [a1; ...; an] represents
+    the dictionary with keys of set {a1, ..., an} and values of ().  
+    [] represents the empty Dictionary Set.
+    Representation invariant: the Dictionary Set contains no duplicates. *)
 
     module Dict = DM(Elt)(Un)
 
@@ -68,48 +68,36 @@ module Make =
       | GT -> 1
 
     let rep_ok s =
-      (*failwith "Unimplemented"*)
       s
 
     let empty =
-      (* TODO: replace [()] with a value of your rep type [t]. *)
       Dict.empty
 
     let is_empty s =
-      (*failwith "Unimplemented"*)
       Dict.is_empty s
 
     let size s =
-      (*failwith "Unimplemented"*)
       Dict.size s
 
     let insert x s =
-      (*failwith "Unimplemented"*)
       Dict.insert x () s
 
     let member x s =
-      (*failwith "Unimplemented"*)
       Dict.member x s 
 
     let remove x s =
-      (*failwith "Unimplemented"*)
       Dict.remove x s
 
     let choose s =
-      (*failwith "Unimplemented"*)
       let tup = Dict.choose s in 
       match tup with
       | None -> None
       | Some (a,b) -> Some a
 
     let fold f init s =
-      (*failwith "Unimplemented"*)
       Dict.fold (fun k v acc -> f k acc) init s
-    (* List.fold_left (fun acc (x,()) -> f x acc) init *)
 
     let union s1 s2 =
-      (* failwith "Unimplemented" *)
-
       let rec unite_sets d1 d2 = 
 
         let l2 = Dict.to_list d2 in 
@@ -124,8 +112,6 @@ module Make =
       unite_sets s1 s2
 
     let intersect s1 s2 =
-      (* failwith "Unimplemented" *)
-
       let rec intersect_sets d1 d2 acc =
 
         let l1 = Dict.to_list d1 in 
@@ -154,10 +140,8 @@ module Make =
       difference_sets s1 s2 Dict.empty
 
     let to_list s =
-      (*failwith "Unimplemented"*)
       Dict.to_list s |> List.map fst
 
     let format fmt d =
-      (* Format.fprintf fmt "<unimplemented>"  *)
       d |> Dict.to_list |> format_elt_list Elt.format fmt
   end

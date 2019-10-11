@@ -18,10 +18,11 @@ module Make : DictionaryMaker
     type key = K.t
     type value = V.t
 
-    (* TODO: change type [t] from [unit] to something involving
-       association lists. *)
-    (** AF: TODO: document the abstraction function.
-        RI: TODO: document any representation invariants. *)
+    (** Abstraction function: the List Dictionary [a1 -> b1; ...; an -> bn] 
+    represents the dictionary with keys of set {a1, ..., an} and values of set 
+    {b1, ..., bn}. [] represents the empty List Dictionary.
+    Representation invariant: the List Dictionary contains no duplicates. *)
+
     type t = (key * value) list
 
     let compare x y =
@@ -31,7 +32,6 @@ module Make : DictionaryMaker
       | GT -> 1
 
     let rep_ok d =
-      (* Might want to reinforce no dups ? *)
       d
 
     let empty = 

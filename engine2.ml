@@ -18,23 +18,19 @@ module Make =
     -> functor (D:Dictionary.Dictionary with type Key.t = string
                                          and type Value.t = S.t) 
     -> struct
-    
-    (** Abstraction function: the Engine [a1 -> [b1]; ...; an -> [bn]] represents
-    the dictionary with keys of set {a1, ..., an} and values of set 
-    {b1, ..., bn} each representing a Dictionary Set.  
-    [] represents the empty Engine.
-    Representation invariant: the Engine contains no duplicates. all keys
-    are lowercase ascii. *)
-
+      (* TODO: replace [unit] with a type of your own design. *)
+      (** AF: TODO: document the abstraction function.
+          RI: TODO: document any representation invariants. *)
       type idx = D.t
 
       let index_of_dir d =
+        (* failwith "Unimplemented" *)
 
         let valid_file_name = Str.regexp "^.*\\.txt$" in
         (* let valid_preword = Str.regexp "\\S+" in
            let valid_word = Str.regexp "[A-Za-z0-9(\\S*?)[A-Za-z0-9]|[A-Za-z0-9]" in  *)
         (* let whitespace = Str.regexp "\\s+" in  *)
-        let boundary_character = Str.regexp "[A-Za-z0-9]" in 
+        let boundary_character = Str.regexp "[A-Z-a-z0-9]" in 
 
 
         let rec iter_dir dir acc =
@@ -100,6 +96,7 @@ module Make =
           Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found)
 
       let words idx = 
+        (* failwith "Unimplemented" *)
 
         let rec get_words idx (acc:string list) = 
           let tmp = D.choose idx in 
@@ -111,79 +108,107 @@ module Make =
         get_words idx []
 
       let to_list idx =
-
+        (*failwith "Unimplemented"*)
+      (* D.to_list idx  *)
         let rec get_pairs idx acc = 
           let tmp = D.choose idx in 
           match tmp with 
           | None -> acc
           | Some s -> let k = (fst s) in 
-            let v = S.to_list (snd s) in 
-            get_pairs (D.remove k idx) ((k,v)::acc)
+                      let v = S.to_list (snd s) in 
+                      get_pairs (D.remove k idx) ((k,v)::acc)
         in 
 
         get_pairs idx []
 
       let or_not idx ors nots =
+        (* failwith "Unimplemented" *)
 
-        let rec acc_ors ors_lst idx_lst acc =
+        let rec acc_ors ors_lst idx acc =
           match ors_lst with 
-          | [] -> List.flatten acc
-          | h::t -> if List.mem_assoc h idx_lst then 
-              match List.assoc_opt h idx_lst with 
-              | None -> acc_ors t idx_lst acc 
-              | Some s -> acc_ors t idx_lst (s::acc)
-            else acc_ors t idx_lst acc
-        in
-
-        let rec remove lst acc =
-          match lst with 
           | [] -> acc 
-          | h::t -> remove t (List.filter (fun x -> x <> h) acc)
+          | h::t -> if D.member h idx then (
+                      match D.find h idx with 
+                      | None -> acc_ors t idx acc 
+                      | Some s -> let new_acc = s |> S.to_list |> List.append acc |> List.sort_uniq compare in 
+                                  acc_ors t (D.remove h idx) new_acc
+                      )
+                    else acc_ors t idx acc 
         in 
 
-        let rec rem_nots nots_lst idx_lst acc =
+        let rec rem_nots nots_lst acc =
           match nots_lst with 
-          | [] -> List.sort_uniq compare acc
-          | h::t -> if List.mem_assoc h idx_lst then 
-              match List.assoc_opt h idx_lst with 
-              | None -> rem_nots t idx_lst acc 
-              | Some s -> rem_nots t idx_lst (remove s acc)
-            else rem_nots t idx_lst acc 
+          | [] -> acc 
+          | h::t -> if List.mem h acc then 
+                    rem_nots t (List.filter (fun x -> x <> h) acc)
+                    else rem_nots t acc 
         in 
 
-        rem_nots nots (to_list idx) (acc_ors ors (to_list idx) [])
+        rem_nots nots (acc_ors ors idx [])
+
+      let valid_file_name = Str.regexp "^.*\\.txt$"
+
+      let rec file_names dir acc =
+          try 
+            let f = (Unix.readdir dir) in 
+            if Str.string_match valid_file_name f 0 then
+              file_names dir (f::acc) else file_names dir acc
+          with End_of_file -> Unix.closedir dir; acc
+
+      let file_list d = 
+        try
+          let dir_handle = Unix.opendir d in 
+          file_names dir_handle []
+        with Unix.Unix_error (Unix.ENOENT, "opendir", d) -> raise (Not_found)
 
       let and_not idx ands nots =
+        (*failwith "Unimplemented"*)
 
-        let rec acc_ands ands_lst idx_lst acc =
-          match ands_lst with 
-          | [] -> List.flatten acc
-          | h::t -> if List.mem_assoc h idx_lst then 
-              match List.assoc_opt h idx_lst with 
-              | None -> acc_ands t idx_lst []
-              | Some s -> acc_ands t idx_lst (s::acc)
-            else acc_ands t idx_lst []
-        in
+        let rec element_match elt files_lst idx bool_acc =
+          match files_lst with 
+          | [] -> bool_acc
+          | h::t -> let vset = D.find elt idx in 
+                    match vset with
+                    | None -> element_match elt t idx (false && bool_acc)
+                    | Some s -> 
+                                let files = S.to_list s in 
+                                if  
+                                then element_match elt t (true && bool_acc) 
+                                else element_match elt t (false && bool_acc)
+        in 
 
-        let rec remove lst acc =
+        let rec all_elements file_list acc =
+          match file_list with
+          | [] -> acc
+          | h::t -> if not (acc = []) && not (List.mem h acc) then 
+
+                    else
+
+        let rec contains_all and_lst idx file_acc =
+            match and_lst with
+            | [] -> file_acc
+            | h::t -> if D.member h idx then 
+                        let v = D.find h idx in 
+                        match v with 
+                        | None -> contains_all t idx file_acc
+                        | Some s -> let files = S.to_list s in 
+                                    
+
+        (* let rec contains_all lst acc = 
+
+
+        let rec ands_files idx lst acc = 
           match lst with 
-          | [] -> acc 
-          | h::t -> remove t (List.filter (fun x -> x <> h) acc)
-        in 
+          | [] -> acc
+          | h::t -> if D.member h idx then 
+                      match D.find h idx with 
+                      | None -> ands_files idx t acc
+                      | Some s -> let all_files = S.to_list s in 
 
-        let rec rem_nots nots_lst idx_lst acc =
-          match nots_lst with 
-          | [] -> List.sort_uniq compare acc
-          | h::t -> if List.mem_assoc h idx_lst then 
-              match List.assoc_opt h idx_lst with 
-              | None -> rem_nots t idx_lst acc 
-              | Some s -> rem_nots t idx_lst (remove s acc)
-            else rem_nots t idx_lst acc 
-        in 
-
-        rem_nots nots (to_list idx) (acc_ands ands (to_list idx) [])
+                      ) *)
 
       let format fmt idx =
+        (* format_list format_string fmt idx *)
         D.format fmt idx
 
 
