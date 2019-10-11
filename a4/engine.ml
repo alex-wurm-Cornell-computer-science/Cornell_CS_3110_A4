@@ -29,7 +29,7 @@ module Make =
         (* let valid_preword = Str.regexp "\\S+" in
            let valid_word = Str.regexp "[A-Za-z0-9(\\S*?)[A-Za-z0-9]|[A-Za-z0-9]" in  *)
         (* let whitespace = Str.regexp "\\s+" in  *)
-        let boundary_character = Str.regexp "[A-Z-a-z0-9]" in 
+        let boundary_character = Str.regexp "[A-Za-z0-9]" in 
 
 
         let rec iter_dir dir acc =
